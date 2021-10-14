@@ -1,0 +1,13 @@
+# In progress files
+*.lo
+*.o
+*.a
+*.dll
+# Binary and object directories
+bin/
+obj/
+# Editor swap files
+.*.swp
+*~
+# PGE files
+src/olcPixelGameEngine.h
