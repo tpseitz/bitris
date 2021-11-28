@@ -14,7 +14,7 @@ TARGET = bin
 .PHONY: all clean
 
 
-all: tetris tetristui
+all: tetris tetristui test
 
 
 tetristui: tetris.o tetris_tui.o
@@ -23,6 +23,9 @@ tetristui: tetris.o tetris_tui.o
 
 tetris: tetris.o tetris_gui.o
 	$(CXX) $^ -o $(TARGET)/$@ $(LDFLAGS_TUI)
+
+test: test.o
+	$(CXX) $^ -o $(TARGET)/$@
 
 
 %.o: $(SOURCE)/%.cpp $(TARGET)

@@ -11,7 +11,7 @@ void drawBits(uint16_t dt) { _drawBits(dt, 16); }
 void drawBits(uint32_t dt) { _drawBits(dt, 32); }
 void drawBits(uint64_t dt) { _drawBits(dt, 64); }
 
-const char hxc[] = "0123456789ABCDEF";
+const char hxc[17] = "0123456789ABCDEF";
 void _drawHex(uint64_t dt, int bits) {
   std::cout << "0x";
   for (int i = bits - 4; i >= 0; i -= 4) std::cout << hxc[(dt >> i) & 0b1111];
