@@ -18,7 +18,7 @@ olc::Key
   DROP_SOFT   = olc::Key::S,  DROP_HARD    = olc::Key::ENTER,
   PAUSE       = olc::Key::ESCAPE;
 
-int key_repeat_after = 10;
+int key_repeat_after = 30;
 
 olc::Sprite* _createBlock(olc::Pixel center, olc::Pixel border) {
   olc::Sprite* img = new olc::Sprite(8, 8);
@@ -39,7 +39,7 @@ olc::Sprite* _createBlock(olc::Pixel center, olc::Pixel border) {
 }
 
 class Example : public olc::PixelGameEngine {
-  float fTime = 0;
+  float fTime = 0, fWaitTime = 0;
   olc::Sprite *block[THEMES][7];
   int block_w = 8, block_h = 8;
 
@@ -167,8 +167,12 @@ public:
   }
 
   bool OnUserUpdate(float fElapsedTime) override {
-    if (pause && GetKey(PAUSE).bReleased) pause = false;
-    else if (tetris && gameon) {
+    if (pause && GetKey(PAUSE).bReleased) {
+      pause = false;
+    } else if (tetris && gameon && fWaitTime > 0.0) {
+      fWaitTime -= fElapsedTime;
+      _drawTetris();
+    } else if (tetris && gameon) {
       if (GetKey(PAUSE).bPressed) pause = true;
       _readTetrisKeys();
       _updateRound();
@@ -180,7 +184,8 @@ public:
         return false; //XXX
       } else _drawTetris();
     } else {
-      tetris = new Tetris(9);
+      tetris = new Tetris(5);
+      fWaitTime = 2.0;
       gameon = true;
     }
 
