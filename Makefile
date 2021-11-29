@@ -1,8 +1,8 @@
-CXX = g++
-RM = rm -f
-MKDIR = mkdir -p
-RMDIR = rmdir -p
-CPPFLAGS = -g -c -std=c++14
+CXX=g++
+RM=rm -f
+MKDIR=mkdir -p
+RMDIR=rmdir -p
+CPPFLAGS=-g -c -std=c++14
 LDFLAGS_GUI=-g -lpthread -lcurses -lstdc++fs
 LDFLAGS_TUI=-g -lpthread -lX11 -lGL -lpng -lstdc++fs
 CPPFLAGS=-g -c -std=c++17
