@@ -1,7 +1,12 @@
+#include <thread>
+#include <chrono>
 #include "olcPixelGameEngine.h"
 #include "tetris_gui.h"
 
+using namespace std::chrono_literals;
+
 const float FRAME_SPEED = 0.02;
+const int WIDTH = 256, HEIGHT = 224;
 const olc::Pixel COLOR[THEMES][2] = {
   { 0xfff85800, 0xfffcbc3c }, { 0xff00a800, 0xff18f8b8 },
   { 0xffcc00d8, 0xfff878f8 }, { 0xfff85800, 0xff54d858 },
@@ -45,6 +50,8 @@ bool TetrisGUI::_initGame() {
   well = new olc::Sprite(10 * block_w, 20 * block_h);
   next = new olc::Sprite(4 * block_w, 4 * block_h);
 
+  state = STATE_MENU;
+
   return true;
 }
 
@@ -55,7 +62,9 @@ void TetrisGUI::_updateRound() {
   if (rotate_left  > key_repeat_after) tetris->rotateLeft();
   if (rotate_right > key_repeat_after) tetris->rotateRight();
 
-  gameon = tetris->round();
+  bool gameon = tetris->round();
+
+  if (!gameon) state = STATE_GAMEOVER;
 }
 
 
@@ -72,28 +81,59 @@ bool TetrisGUI::OnUserCreate() {
 }
 
 
+void TetrisGUI::_newGame(int level) {
+  tetris = new Tetris(level);
+  fWaitTime = 1.0;
+  state = STATE_GET_READY;
+}
+
+
+void TetrisGUI::_destroyGame() {
+  if (tetris) delete tetris;
+  tetris = NULL;
+  state = STATE_MENU;
+}
+
+
 bool TetrisGUI::OnUserUpdate(float fElapsedTime) {
-  if (pause) {
-    _readPauseEvents();
-    _drawTetris();
-  } else if (tetris && gameon && fWaitTime > 0.0) {
-    fWaitTime -= fElapsedTime;
-    _drawTetris();
-  } else if (tetris && gameon) {
-    _readTetrisEvents();
-    _updateRound();
-    _drawTetris();
-  } else if (tetris) {
-    if (GetKey(olc::Key::ESCAPE).bPressed) {
-      return false;
-    } else if (GetKey(olc::Key::ENTER).bPressed) {
-      delete tetris;
-      tetris = NULL;
-    } else _drawTetris();
-  } else {
-    tetris = new Tetris(5);
-    fWaitTime = 2.0;
-    gameon = true;
+  std::chrono::milliseconds wait { int((FRAME_SPEED - fElapsedTime) * 1000.0) };
+  if (FRAME_SPEED > fElapsedTime) std::this_thread::sleep_for(wait);
+
+  switch (state) {
+    case STATE_ERROR:
+      if (GetKey(olc::Key::ESCAPE).bPressed) running = false;
+      break;
+    case STATE_MENU:
+      _readMenuEvents();
+      _drawMenu();
+      break;
+    case STATE_OPTIONS:
+      break;
+    case STATE_GET_READY:
+      fWaitTime -= fElapsedTime;
+      if (fWaitTime <= 0) state = STATE_GAMEON;
+      _drawTetris();
+      break;
+    case STATE_PAUSE:
+      _readPauseEvents();
+      _drawTetris();
+      break;
+    case STATE_GAMEON:
+      _readTetrisEvents();
+      _updateRound();
+      _drawTetris();
+      break;
+    case STATE_GAMEOVER:
+      fWaitTime -= fElapsedTime;
+      if (fWaitTime <= 0 and (
+          GetKey(olc::Key::ESCAPE).bPressed
+          or GetKey(olc::Key::ENTER).bPressed)) {
+        state = STATE_MENU;
+      }
+      _drawTetris();
+      break;
+    default:
+      state = STATE_ERROR;
   }
 
   return running;

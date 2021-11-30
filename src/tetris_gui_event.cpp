@@ -7,15 +7,28 @@ olc::Key
   PAUSE       = olc::Key::ESCAPE;
 
 
+void TetrisGUI::_readMenuEvents() {
+  if (GetKey(olc::Key::ESCAPE).bPressed) running = false;
+  if (GetKey(olc::Key::LEFT).bPressed) start_level--;
+  if (GetKey(olc::Key::RIGHT).bPressed) start_level++;
+  if (GetKey(olc::Key::ENTER).bPressed) _newGame(start_level);
+  while (start_level < 0) start_level += 20;
+  start_level %= 20;
+}
+
+
 void TetrisGUI::_readPauseEvents() {
-  if (GetKey(PAUSE).bReleased) pause = false;
-  if (GetKey(olc::Key::F10).bReleased) running = false;
+  if (GetKey(PAUSE).bPressed) state = STATE_GAMEON;
+  if (GetKey(olc::Key::F10).bPressed) {
+    _destroyGame();
+    running = false;
+  }
 }
 
 
 void TetrisGUI::_readTetrisEvents() {
   if (GetKey(PAUSE).bPressed) {
-    pause = true;
+    state = STATE_PAUSE;
     return;
   }
 

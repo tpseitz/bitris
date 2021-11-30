@@ -1,6 +1,14 @@
 #include "tetris_gui.h"
 
 
+void TetrisGUI::_drawMenu() {
+  FillRect(0, 0, ScreenWidth(), ScreenHeight(), 0xff000000);
+  char buf[10];
+  sprintf(buf, "Level %d", start_level);
+  DrawString(4, 4, buf, olc::WHITE);
+}
+
+
 void TetrisGUI::_drawWell() {
   for (int y = 0; y < 20; y++) {
     uint16_t ln = tetris->well[y + 1] >> 3;
