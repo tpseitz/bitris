@@ -1,10 +1,12 @@
 #ifndef TETRIS_GUI_H
 #define TETRIS_GUI_H
 
+#include <cstdint>
+#include "olcPixelGameEngine.h"
+#include "tetris.h"
+
 
 #define THEMES 10
-
-#include "tetris.h"
 
 
 class TetrisGUI : public olc::PixelGameEngine {
@@ -12,8 +14,10 @@ class TetrisGUI : public olc::PixelGameEngine {
   olc::Sprite *block[THEMES][7];
   int block_w = 8, block_h = 8;
 
+  int key_repeat_after = 30;
+
   Tetris *tetris = NULL;
-  bool gameon = false, pause = false;
+  bool running = true, gameon = false, pause = false;
   olc::Sprite* background = NULL;
   olc::Sprite* well = NULL;
   olc::Sprite* next = NULL;
@@ -22,7 +26,8 @@ class TetrisGUI : public olc::PixelGameEngine {
 
   bool _createGraphics();
   bool _initGame();
-  void _readTetrisKeys();
+  void _readPauseEvents();
+  void _readTetrisEvents();
   void _updateRound();
   void _drawWell();
   void _drawNext();

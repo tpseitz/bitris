@@ -21,7 +21,7 @@ tetristui: tetris.o tetris_tui.o
 	$(CXX) $^ -o $(TARGET)/$@ $(LDFLAGS_GUI)
 
 
-tetris: tetris.o tetris_gui.o
+tetris: tetris.o olcPixelGameEngine.o tetris_gui_event.o tetris_gui_draw.o tetris_gui.o
 	$(CXX) $^ -o $(TARGET)/$@ $(LDFLAGS_TUI)
 
 test: test.o
